@@ -1,27 +1,76 @@
 #pragma once
 #include "BaseClass.h"
 
-//наследование - использование доступных свойств
-// и методов класса родителям (parent), классом наследником(child)
-class Warrior : protected virtual Npc //наследование с модификатором доступа public
+//РЅР°СЃР»РµРґРѕРІР°РЅРёРµ - РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРµ РґРѕСЃС‚СѓРїРЅС‹С… СЃРІРѕР№СЃС‚РІ
+// Рё РјРµС‚РѕРґРѕРІ РєР»Р°СЃСЃР° СЂРѕРґРёС‚РµР»СЏРј (parent), РєР»Р°СЃСЃРѕРј РЅР°СЃР»РµРґРЅРёРєРѕРј(child)
+class Warrior : public virtual Npc //РЅР°СЃР»РµРґРѕРІР°РЅРёРµ СЃ РјРѕРґРёС„РёРєР°С‚РѕСЂРѕРј РґРѕСЃС‚СѓРїР° public
 {
-protected:  //модификатор 0 (приватный - защищенный, доступ к полям, только внутри класса)
+protected:  //РјРѕРґРёС„РёРєР°С‚РѕСЂ 0 (РїСЂРёРІР°С‚РЅС‹Р№ - Р·Р°С‰РёС‰РµРЅРЅС‹Р№, РґРѕСЃС‚СѓРї Рє РїРѕР»СЏРј, С‚РѕР»СЊРєРѕ РІРЅСѓС‚СЂРё РєР»Р°СЃСЃР°)
     unsigned short strenght{ 31 };
-    string weapons[4] = { "кастет", "дубинка", "клинок", "меч" };
+    string weapons[4] = { "РєР°СЃС‚РµС‚", "РґСѓР±РёРЅРєР°", "РєР»РёРЅРѕРє", "РјРµС‡" };
 public:
-    //конструктор - метод, который вызывается в момент создания экземпляра
-    //класса (вручную вызвать в основном потоке программы не можем)
-
-    Warrior() //конструктор по умолчанию, когда нет аргументов
+    //РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ - РјРµС‚РѕРґ, РєРѕС‚РѕСЂС‹Р№ РІС‹Р·С‹РІР°РµС‚СЃСЏ РІ РјРѕРјРµРЅС‚ СЃРѕР·РґР°РЅРёСЏ СЌРєР·РµРјРїР»СЏСЂР°
+    //РєР»Р°СЃСЃР° (РІСЂСѓС‡РЅСѓСЋ РІС‹Р·РІР°С‚СЊ РІ РѕСЃРЅРѕРІРЅРѕРј РїРѕС‚РѕРєРµ РїСЂРѕРіСЂР°РјРјС‹ РЅРµ РјРѕР¶РµРј)
+    bool Save() override
     {
-        name = "воин";
+
+        
+        if (Npc::Save())
+        {
+            ofstream saveSystem("save.bin", ios::binary);
+            if (saveSystem.is_open())
+            {
+               
+                saveSystem.write(reinterpret_cast<const char*>(&strenght), sizeof(strenght));
+                for (int i = 0; i < 4; i++)
+                {
+                    saveSystem.write(reinterpret_cast<const char*>(&weapons[i]), sizeof(weapons[i]));
+                }
+                saveSystem.close();
+                return true;
+            }
+            else
+            {
+                cout << "СЃРѕС…СЂР°РЅРµРЅРёРµ РЅРµ СѓРґР°Р»РѕСЃСЊ" << endl;
+                return false;
+            }
+        }       
+    };
+    Warrior Load()
+    {
+        ifstream loadSystem("save.bin", ios::binary);
+        Warrior warrior; //РІСЂРµРјРµРЅРЅРѕРµ С…СЂР°РЅРёР»РёС‰Рµ РґР»СЏ СЃС‡РёС‚С‹РІР°РЅРёСЏ РґР°РЅРЅС‹С… РёР· С„Р°Р№Р»Р°
+        warrior = Npc::Load();
+        if (loadSystem.is_open())
+        {
+            loadSystem.read(reinterpret_cast<char*>(&strenght), sizeof(strenght));
+            for (int i = 0; i < 4; i++)
+            {
+                loadSystem.read(reinterpret_cast<char*>(&weapons[i]), sizeof(weapons[i]));
+            }
+        }
+        else
+        {
+            cout << "СЃРІСЏР·СЊ СЃ Р±Р°Р·РѕР№ РЅР°СЂСѓС€РµРЅР°\nРџР°РјСЏС‚СЊ СѓС‚РµСЂРµРЅР°" << endl;
+            return warrior;
+        }
+        loadSystem.close();
+        return warrior;
+
+
+    };
+    
+
+    Warrior() //РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ, РєРѕРіРґР° РЅРµС‚ Р°СЂРіСѓРјРµРЅС‚РѕРІ
+    {
+        name = "РІРѕРёРЅ";
         health = 35;
         damage = 10;
     }
-    //кастомный конструктор
+    //РєР°СЃС‚РѕРјРЅС‹Р№ РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     Warrior(string name, unsigned int health, float damage)
     {
-        cout << "кастомный конструктор война" << endl;
+        cout << "РєР°СЃС‚РѕРјРЅС‹Р№ РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РІРѕР№РЅР°" << endl;
         this->name = name;
         this->health = health;
         this->damage = damage;
@@ -29,13 +78,13 @@ public:
 
     void GetWeapons()
     {
-        cout << name << " взял в руки " << weapons[lvl - 1];
+        cout << name << " РІР·СЏР» РІ СЂСѓРєРё " << weapons[lvl - 1];
     }
-    void GetInfo() override  //полиморфизм (перегрузка для метода)
+    void GetInfo() override  //РїРѕР»РёРјРѕСЂС„РёР·Рј (РїРµСЂРµРіСЂСѓР·РєР° РґР»СЏ РјРµС‚РѕРґР°)
     {
         Npc::GetInfo();
-        cout << "Сила - " << strenght << endl;
-        cout << "Доступное оружие - ";
+        cout << "РЎРёР»Р° - " << strenght << endl;
+        cout << "Р”РѕСЃС‚СѓРїРЅРѕРµ РѕСЂСѓР¶РёРµ - ";
         for (int i = 0; i < lvl; i++)
         {
             cout << weapons[i] << endl;
@@ -43,57 +92,63 @@ public:
     }
     void Create() override
     {
-        cout << "Вы создали война" << endl;
-        cout << "Введите имя персонажа\t";
+        cout << "Р’С‹ СЃРѕР·РґР°Р»Рё РІРѕР№РЅР°" << endl;
+        cout << "Р’РІРµРґРёС‚Рµ РёРјСЏ РїРµСЂСЃРѕРЅР°Р¶Р°\t";
         cin >> name;
         GetInfo();
         GetWeapons();
     }
-    //перегрузка операторов
-    //перегрузка оператора сравнения (==)
+    //РїРµСЂРµРіСЂСѓР·РєР° РѕРїРµСЂР°С‚РѕСЂРѕРІ
+    //РїРµСЂРµРіСЂСѓР·РєР° РѕРїРµСЂР°С‚РѕСЂР° СЃСЂР°РІРЅРµРЅРёСЏ (==)
     
     bool operator == (const Warrior& warrior) const
     {
         return ((warrior.damage == this->damage) && (warrior.health == this->health)
             && (warrior.strenght == this->strenght));
     }
-
-
-    //деструктор - метод, который вызывается автоматически при высвобождении памяти
-    //при окончании работы с экземпляром класса (нельзя вызвать вручную)
-    ~Warrior() //деструктор всегда без аргументов
+    void operator = (Npc npc)
     {
-        cout << name << " пал смертью храбрых" << endl;
+        this->name = npc.GetName();
+        this->name = npc.GetHealth();
+        this->name = npc.GetDamage();
+        this->name = npc.GetLvl();
+    }
+
+    //РґРµСЃС‚СЂСѓРєС‚РѕСЂ - РјРµС‚РѕРґ, РєРѕС‚РѕСЂС‹Р№ РІС‹Р·С‹РІР°РµС‚СЃСЏ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё РїСЂРё РІС‹СЃРІРѕР±РѕР¶РґРµРЅРёРё РїР°РјСЏС‚Рё
+    //РїСЂРё РѕРєРѕРЅС‡Р°РЅРёРё СЂР°Р±РѕС‚С‹ СЃ СЌРєР·РµРјРїР»СЏСЂРѕРј РєР»Р°СЃСЃР° (РЅРµР»СЊР·СЏ РІС‹Р·РІР°С‚СЊ РІСЂСѓС‡РЅСѓСЋ)
+    ~Warrior() //РґРµСЃС‚СЂСѓРєС‚РѕСЂ РІСЃРµРіРґР° Р±РµР· Р°СЂРіСѓРјРµРЅС‚РѕРІ
+    {
+        cout << name << " РїР°Р» СЃРјРµСЂС‚СЊСЋ С…СЂР°Р±СЂС‹С…" << endl;
     }
 };
 
 
-//virtual - создает виртуализацию методов, классов
-//при этом сам класс повторно не создается
-class Wizard : protected virtual Npc
+//virtual - СЃРѕР·РґР°РµС‚ РІРёСЂС‚СѓР°Р»РёР·Р°С†РёСЋ РјРµС‚РѕРґРѕРІ, РєР»Р°СЃСЃРѕРІ
+//РїСЂРё СЌС‚РѕРј СЃР°Рј РєР»Р°СЃСЃ РїРѕРІС‚РѕСЂРЅРѕ РЅРµ СЃРѕР·РґР°РµС‚СЃСЏ
+class Wizard : public virtual Npc
 {
 protected:
     unsigned short intellect = 27;
-    string spell[4] = { "вспышка", "магисческая стрела", "огненный шар", "метеоритный дождь" };
+    string spell[4] = { "РІСЃРїС‹С€РєР°", "РјР°РіРёСЃС‡РµСЃРєР°СЏ СЃС‚СЂРµР»Р°", "РѕРіРЅРµРЅРЅС‹Р№ С€Р°СЂ", "РјРµС‚РµРѕСЂРёС‚РЅС‹Р№ РґРѕР¶РґСЊ" };
 public:
     Wizard()
     {
-        name = "волшебник";
+        name = "РІРѕР»С€РµР±РЅРёРє";
         health = 23;
         damage = 15;
     }
     Wizard(string name, unsigned int health, float damage)
     {
-        cout << "кастомный конструктор волшебника" << endl;
+        cout << "РєР°СЃС‚РѕРјРЅС‹Р№ РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РІРѕР»С€РµР±РЅРёРєР°" << endl;
         this->name = name;
         this->health = health;
         this->damage = damage;
     }
-    void GetInfo() override  //полиморфизм (перегрузка для метода)
+    void GetInfo() override  //РїРѕР»РёРјРѕСЂС„РёР·Рј (РїРµСЂРµРіСЂСѓР·РєР° РґР»СЏ РјРµС‚РѕРґР°)
     {
         Npc::GetInfo();
-        cout << "Интеллект - " << intellect << endl;
-        cout << "Доступные заклинания в книге заклинаний - ";
+        cout << "РРЅС‚РµР»Р»РµРєС‚ - " << intellect << endl;
+        cout << "Р”РѕСЃС‚СѓРїРЅС‹Рµ Р·Р°РєР»РёРЅР°РЅРёСЏ РІ РєРЅРёРіРµ Р·Р°РєР»РёРЅР°РЅРёР№ - ";
         for (int i = 0; i < lvl; i++)
         {
             cout << spell[i] << endl;
@@ -101,30 +156,56 @@ public:
     }
     void CastSpell()
     {
-        cout << name << " применяет " << spell[lvl - 1] << endl;
+        cout << name << " РїСЂРёРјРµРЅСЏРµС‚ " << spell[lvl - 1] << endl;
     }
     void Create() override
     {
-        cout << "Вы создали волшебника" << endl;
-        cout << "Введите имя персонажа\t";
+        cout << "Р’С‹ СЃРѕР·РґР°Р»Рё РІРѕР»С€РµР±РЅРёРєР°" << endl;
+        cout << "Р’РІРµРґРёС‚Рµ РёРјСЏ РїРµСЂСЃРѕРЅР°Р¶Р°\t";
         cin >> name;
         GetInfo();
         CastSpell();
     }
-    ~Wizard() //деструктор всегда без аргументов
+    bool Save() override
     {
-        cout << name << " испустил дух" << endl;
+
+
+        if (Npc::Save())
+        {
+            ofstream saveSystem("save.bin", ios::binary);
+            if (saveSystem.is_open())
+            {
+
+                saveSystem.write(reinterpret_cast<const char*>(&intellect), sizeof(intellect));
+                for (int i = 0; i < 4; i++)
+                {
+                    saveSystem.write(reinterpret_cast<const char*>(&spell[i]), sizeof(spell[i]));
+                }
+                saveSystem.close();
+                return true;
+            }
+            else
+            {
+                cout << "СЃРѕС…СЂР°РЅРµРЅРёРµ РЅРµ СѓРґР°Р»РѕСЃСЊ" << endl;
+                return false;
+            }
+        }
     }
+    ~Wizard() //РґРµСЃС‚СЂСѓРєС‚РѕСЂ РІСЃРµРіРґР° Р±РµР· Р°СЂРіСѓРјРµРЅС‚РѕРІ
+    {
+        cout << name << " РёСЃРїСѓСЃС‚РёР» РґСѓС…" << endl;
+    }
+
 };
 
-//множественное наследование
+//РјРЅРѕР¶РµСЃС‚РІРµРЅРЅРѕРµ РЅР°СЃР»РµРґРѕРІР°РЅРёРµ
 class Paladin : public Warrior, public Wizard
-    //следующий родительственный класс добавляется через запятую
+    //СЃР»РµРґСѓСЋС‰РёР№ СЂРѕРґРёС‚РµР»СЊСЃС‚РІРµРЅРЅС‹Р№ РєР»Р°СЃСЃ РґРѕР±Р°РІР»СЏРµС‚СЃСЏ С‡РµСЂРµР· Р·Р°РїСЏС‚СѓСЋ
 {
 public:
     Paladin()
     {
-        name = "паладин";
+        name = "РїР°Р»Р°РґРёРЅ";
         health = 25;
         damage = 12;
         strenght = 27;
@@ -132,8 +213,8 @@ public:
     void GetInfo() override
     {
         Warrior::GetInfo();
-        cout << "Интеллект - " << intellect << endl;
-        cout << "Доступные заклинания в книге заклинаний - ";
+        cout << "РРЅС‚РµР»Р»РµРєС‚ - " << intellect << endl;
+        cout << "Р”РѕСЃС‚СѓРїРЅС‹Рµ Р·Р°РєР»РёРЅР°РЅРёСЏ РІ РєРЅРёРіРµ Р·Р°РєР»РёРЅР°РЅРёР№ - ";
         for (int i = 0; i < lvl; i++)
         {
             cout << spell[i] << endl;
@@ -141,11 +222,37 @@ public:
     }
     void Create() override
     {
-        cout << "Вы создали паладина" << endl;
-        cout << "Введите имя персонажа\t";
+        cout << "Р’С‹ СЃРѕР·РґР°Р»Рё РїР°Р»Р°РґРёРЅР°" << endl;
+        cout << "Р’РІРµРґРёС‚Рµ РёРјСЏ РїРµСЂСЃРѕРЅР°Р¶Р°\t";
         cin >> name;
         GetInfo();
         CastSpell();
         GetWeapons();
     }
+    bool Save() override
+    {
+
+
+        if (Npc::Save())
+        {
+            ofstream saveSystem("save.bin", ios::binary);
+            if (saveSystem.is_open())
+            {
+
+                saveSystem.write(reinterpret_cast<const char*>(&intellect), sizeof(intellect));
+                for (int i = 0; i < 4; i++)
+                {
+                    saveSystem.write(reinterpret_cast<const char*>(&spell[i]), sizeof(spell[i]));
+                }
+                saveSystem.close();
+                return true;
+            }
+            else
+            {
+                cout << "СЃРѕС…СЂР°РЅРµРЅРёРµ РЅРµ СѓРґР°Р»РѕСЃСЊ" << endl;
+                return false;
+            }
+        }
+    }
 };
+
