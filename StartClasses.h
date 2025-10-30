@@ -14,13 +14,13 @@ public:
     bool Save() override
     {
 
-        
+
         if (Npc::Save())
         {
             ofstream saveSystem("save.bin", ios::binary);
             if (saveSystem.is_open())
             {
-               
+
                 saveSystem.write(reinterpret_cast<const char*>(&strenght), sizeof(strenght));
                 for (int i = 0; i < 4; i++)
                 {
@@ -34,7 +34,7 @@ public:
                 cout << "сохранение не удалось" << endl;
                 return false;
             }
-        }       
+        }
     };
     Warrior Load()
     {
@@ -59,7 +59,7 @@ public:
 
 
     };
-    
+
 
     Warrior() //конструктор по умолчанию, когда нет аргументов
     {
@@ -100,7 +100,7 @@ public:
     }
     //перегрузка операторов
     //перегрузка оператора сравнения (==)
-    
+
     bool operator == (const Warrior& warrior) const
     {
         return ((warrior.damage == this->damage) && (warrior.health == this->health)
@@ -166,6 +166,18 @@ public:
         GetInfo();
         CastSpell();
     }
+    bool operator == (const Wizard& wizard) const
+    {
+        return ((wizard.damage == this->damage) && (wizard.health == this->health)
+            && (wizard.intellect == this->intellect));
+    }
+    void operator = (Npc npc)
+    {
+        this->name = npc.GetName();
+        this->name = npc.GetHealth();
+        this->name = npc.GetDamage();
+        this->name = npc.GetLvl();
+    }
     bool Save() override
     {
 
@@ -229,6 +241,18 @@ public:
         CastSpell();
         GetWeapons();
     }
+    bool operator == (const Paladin& paladin) const
+    {
+        return ((paladin.damage == this->damage) && (paladin.health == this->health)
+            && (paladin.intellect == this->intellect)) && (paladin.strenght == this->strenght);
+    }
+    void operator = (Npc npc)
+    {
+        this->name = npc.GetName();
+        this->name = npc.GetHealth();
+        this->name = npc.GetDamage();
+        this->name = npc.GetLvl();
+    }
     bool Save() override
     {
 
@@ -255,4 +279,6 @@ public:
         }
     }
 };
+
+
 
