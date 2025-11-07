@@ -3,16 +3,55 @@
 #include "BaseClass.h"
 #include "StartClasses.h"
 #include "Evil.h"
-
+#include "fstream"
 using namespace std;
 
-//модификаторы доступа:
-// private - приватный, запрещает доступ к свойствам и классам
-//           за пределами самого класса
-// protected - защищенный, можно передавать свойства и методы
-//        в классы наследники, но все еще нельзя использовать
-//        в основном потоке программы
-// public - публичный, общедоступный, можно использовать везде
+enum class ValueQuality
+{
+    trash, common, rare, mifical, legendary
+};
+
+struct Treasure // public
+{
+    string name{"добыча"};
+    ValueQuality quality = ValueQuality ::trash;
+    unsigned int price{ 0 };
+    Treasure(ValueQuality quality)
+    {
+        switch (quality)
+        {
+        case ValueQuality::trash:
+            cout << "качество плохое\n";
+            break;
+        case ValueQuality::common:
+            cout << "качество среднее\n";
+            break;
+        case ValueQuality::rare:
+            cout << "качество среднее\n";
+            break;
+        case ValueQuality::mifical:
+            cout << "качество крутое\n";
+            break;
+        case ValueQuality::legendary:
+            cout << "качество идеальное\n";
+            break;
+        default:
+            break;
+        }
+    }
+
+};
+
+
+struct Cloth : Treasure
+{
+    Cloth(ValueQuality quality) : Treasure(quality){}
+    string valueSite[5]{ "обувь","перчатки","шлем","нагрудник","пояс" };
+    string site{ NULL };
+    unsigned short armor{ 1 };
+
+};
+
 
 
 //базовый класс - абстрактный (класс у которого все методы виртуальные)
@@ -24,6 +63,19 @@ int main()
     setlocale(LC_ALL, ".UTF-8");
     SetConsoleCP(1251);
     SetConsoleOutputCP(1251);
+
+    //Treasure treasure(ValueQuality::мифическое);
+    //treasure.name = "древняя тарелка";
+    //treasure.price = 30;
+    //treasure.quality = treasure.valueQuality[3];
+    //cout << treasure.name << '\n' << treasure.price << '\n' << treasure.quality << '\n';
+
+    Cloth cloth(ValueQuality::mifical);
+    cloth.armor = 10;
+    cloth.site = cloth.valueSite[2];
+    cloth.name = "шлем древнего друида";
+    cloth.price = 50;
+    cout << cloth.name << '\n' << cloth.price << '\n' << cloth.site << '\n' << cloth.armor << '\n';
 
     Warrior* warrior = new Warrior();
     Warrior* warrior2 = new Warrior();
@@ -119,3 +171,4 @@ int main()
 
     return 0;
 }
+
