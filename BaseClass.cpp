@@ -1,22 +1,22 @@
 #include "BaseClass.h"
 
-string Npc::GetName()
+string Npc::GetName() const
 {
     return name;
 }
-unsigned int Npc::GetHealth()
+unsigned int Npc::GetHealth()const
 {
     return health;
 }
-float Npc::GetDamage()
+float Npc::GetDamage()const
 {
     return damage;
 }
-unsigned int Npc::GetLvl()
+unsigned int Npc::GetLvl()const
 {
     return lvl;
 }
-void Npc::GetInfo() //метод класса
+void Npc::GetInfo() const//метод класса
 {
     cout << "Имя - " << name << endl;
     cout << "Здоровье - " << health << endl;
@@ -42,36 +42,60 @@ bool Npc::Save()
     }
     saveSystem.close();
 };
-Npc Npc::Load()
+bool Npc::Load()
 {
     ifstream loadSystem("save.bin", ios::binary);
-    Npc npc; //временное хранилище для считывания данных из файла
     if (loadSystem.is_open())
     {
-        loadSystem.read(reinterpret_cast<char*>(&npc.name), sizeof(npc.name));
-        loadSystem.read(reinterpret_cast<char*>(&npc.health), sizeof(npc.health));
-        loadSystem.read(reinterpret_cast<char*>(&npc.damage), sizeof(npc.damage));
-        loadSystem.read(reinterpret_cast<char*>(&npc.lvl), sizeof(npc.lvl));
+        size_t nameLenght;
+        loadSystem.read(reinterpret_cast<char*>(&nameLenght), sizeof(nameLenght));
+        char* buffer = new char[nameLenght + 1];
+        loadSystem.read(buffer, nameLenght);
+        buffer[nameLenght] = '\0';
+        name = string(buffer);
+        delete[] buffer;
+
+        loadSystem.read(reinterpret_cast<char*>(&health), sizeof(health));
+        loadSystem.read(reinterpret_cast<char*>(&damage), sizeof(damage));
+        loadSystem.read(reinterpret_cast<char*>(&lvl), sizeof(lvl));
+        return loadSystem.good();
+
+
     }
     else
     {
         cout << "связь с базой нарушена\nПамять утерена" << endl;
-        return npc;
+        return false;
     }
     loadSystem.close();
-    return npc;
-
-
+    
 };
-void Player::Create(Npc* player)
+
+void Player::Create(unique_ptr<Npc> player)
 {
-    player->Create();
+    currentCharacter = move(player);
+    currentCharacter->Create();
 }
-void Player::Save(Npc* player)
+void Player::Create()
 {
-    player->Save();
+    if (currentCharacter != nullptr)
+        currentCharacter->Create();
+
+
 }
-void Player::Load(Npc* player)
+bool Player::Save()
 {
-    player->Load();
+    return currentCharacter ? currentCharacter->Save() : false;
+}
+bool Player::Load(unique_ptr<Npc> player)
+{
+    if (player->Load()) {
+        currentCharacter = move(player);
+        return true;
+    }
+    return false;
+}
+Npc* Player::GetCharacter()
+{
+    return currentCharacter.get();
 }
