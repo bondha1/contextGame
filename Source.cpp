@@ -13,8 +13,8 @@ enum class ValueQuality
 
 struct Treasure // public
 {
-    string name{"добыча"};
-    ValueQuality quality = ValueQuality ::trash;
+    string name{ "добыча" };
+    ValueQuality quality = ValueQuality::trash;
     unsigned int price{ 0 };
     Treasure(ValueQuality quality)
     {
@@ -45,17 +45,54 @@ struct Treasure // public
 
 struct Cloth : Treasure
 {
-    Cloth(ValueQuality quality) : Treasure(quality){}
+    Cloth(ValueQuality quality) : Treasure(quality) {}
     string valueSite[5]{ "обувь","перчатки","шлем","нагрудник","пояс" };
     string site{ NULL };
     unsigned short armor{ 1 };
 
 };
 
+enum class CharacterType
+{
+    UNKNOW = 0,
+    WARRIOR,
+    WIZARD,
+    PALADDIN
+};
 
+unique_ptr<Npc> CreateCharacter(CharacterType type)
+{
+    switch (type)
+    {
+    case CharacterType::UNKNOW:
+        return make_unique<Npc>();
+        break;
+    case CharacterType::WARRIOR:
+        return make_unique<Warrior>();
+        break;
+    case CharacterType::WIZARD:
+        return make_unique<Wizard>();
+        break;
+    case CharacterType::PALADDIN:
+        return make_unique<Paladin>();
+        break;
+    default:
+        invalid_argument("Неизвестный тип персонажа");
+        break;
+    }
+}
 
-//базовый класс - абстрактный (класс у которого все методы виртуальные)
-
+unsigned short TestChoise(unsigned short maxChoise, string text)
+{
+    unsigned short choise = 1;
+    cin >> choise;
+    while (choise > maxChoise || choise < 1)
+    {
+        cout << text << endl;
+        cin >> choise;
+    }
+    return choise;
+};
 
 
 int main()
@@ -77,98 +114,47 @@ int main()
     cloth.price = 50;
     cout << cloth.name << '\n' << cloth.price << '\n' << cloth.site << '\n' << cloth.armor << '\n';
 
-    Warrior* warrior = new Warrior();
-    Warrior* warrior2 = new Warrior();
-    cout << (*warrior == *warrior2) << endl;
-
-    Wizard* wizard = new Wizard();
-    Paladin* paladin = new Paladin();
     Player* player = new Player();
 
-    cout << "Привет, путник\nПрисядь у костра и расскажи о себе\n";
-    cout << "Ты впервые тут? (1 - новый персонаж, 2 - загрузить)\n";
-    unsigned short choise = 1;
-    cin >> choise;
-    while (choise > 2 || choise < 1)
+
+    if (TestChoise(2, "Наверно ты ошибся повтори снова"))
     {
-        cout << "Наверное ты ошибся, повтори снова\n";
-        cin >> choise;
-    }
-    /*
-    unsigned short maxChoise = 3;
-    unsigned short TestChoise(unsigned short maxChoise, string text);
-    {
-        unsigned short choise = 1;
-        cin >> choise;
-        while (choise > maxChoise || choise < 1)
+        cout << "" <<"";
+        unique_ptr<Npc> character;
+        switch (TestChoise(3, ""))
         {
-            cout << "Наверное ты ошибся, повтори снова\n";
-            cin >> choise;
+            case 1:
+                character = CreateCharacter(CharacterType::WARRIOR);
+                break;
+            case 2:
+                character = CreateCharacter(CharacterType::WIZARD);
+                break;
+            case 3:
+                character = CreateCharacter(CharacterType::PALADDIN);
+                break;
         }
-        return choise;
-
-       
-    };
-
-    */
-    
-    if (choise == 1)
-    {
-        cout << "Расскажи о своих навыках\n\t1 - Воин\n\t2 - Волшебник\n\t3 - Паладин\n";
-
-        // тут уже будет вызвана ваша красивая функция
-        cin >> choise;
-        while (choise > 3 || choise < 1)
-        {
-            cout << "Такого еще не было в наших краях\nНе мог бы ты повторить\n";
-            cin >> choise;
-        }
-
-
-        switch (choise)
-        {
-        case 1: {
-            player->Create(warrior);
-            delete wizard;
-            wizard = nullptr;
-            delete paladin;
-            paladin = nullptr;
-            break; }
-        case 2: {
-            player->Create(wizard);
-            delete warrior;
-            warrior = nullptr;
-            delete paladin;
-            paladin = nullptr;
-            cout << " " << endl;
-            break; }
-        case 3: {
-            player->Create(paladin);
-            delete warrior;
-            warrior = nullptr;
-            delete wizard;
-            wizard = nullptr;
-            break; }
-        }
+        player->Create(move(character));
 
     }
-
     else
     {
-        player->Load(warrior);
+        ifstream loadSystem("", ios::binary);
+        if (!loadSystem.is_open())
+        {
+            cout << "";
+        }
+        else
+        {
+
+        }
     }
 
-    cout << "сделаем остановку тут?\n\t1 - сохранить игру\n\t2 - продолжить\n";
-    cin >> choise;
-    if (choise == 1)
-    {
-        if (warrior != nullptr) player->Save(warrior);
-        if (wizard != nullptr) player->Save(wizard);
-        if (paladin != nullptr) player->Save(paladin);
-    }
+
+
 
 
 
     return 0;
 }
+
 
