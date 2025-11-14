@@ -6,6 +6,8 @@
 #include "fstream"
 using namespace std;
 
+
+
 enum class ValueQuality
 {
     trash, common, rare, mifical, legendary
@@ -116,12 +118,12 @@ int main()
 
     Player* player = new Player();
 
-
-    if (TestChoise(2, "Наверно ты ошибся повтори снова"))
+    cout << "Привет, путник\nПрисядь у костра и расскажи о себепТы впервые тут?\n\t1 - новый персонаж, \n\t ";
+    if (TestChoise(2, "Наверно ты ошибся, повтори снова"))
     {
-        cout << "" <<"";
+        cout << "Расскажи о своих навыках\n\t1 - Воин\n\t2 - Волшебник\n\t3 - Паладин\n";
         unique_ptr<Npc> character;
-        switch (TestChoise(3, ""))
+        switch (TestChoise(3, "Такого еще не было в наших краях\nНе мог бы ты повторить"))
         {
             case 1:
                 character = CreateCharacter(CharacterType::WARRIOR);
@@ -138,7 +140,7 @@ int main()
     }
     else
     {
-        ifstream loadSystem("", ios::binary);
+        ifstream loadSystem("save.txt", ios::binary);
         if (!loadSystem.is_open())
         {
             cout << "";
@@ -156,5 +158,7 @@ int main()
 
     return 0;
 }
+
+
 
 
