@@ -1,5 +1,6 @@
 #pragma once
 #include "BaseClass.h"
+#include "string"
 
 //наследование - использование доступных свойств
 // и методов класса родителям (parent), классом наследником(child)
@@ -33,9 +34,35 @@ public:
 //при этом сам класс повторно не создается
 class Wizard : public virtual Npc
 {
+
+    class Spell
+    {
+        protected:
+            string name{"заклинание"};
+            unsigned short damage{0};
+            unsigned short price{0};
+            bool isCurse{false};
+            int timeCast{ 0 };
+          
+        public:
+            Spell(string name = "заклинание", unsigned short damage = 0, unsigned short price = 0, bool isCurse = false, int timeCast = 0);
+          
+            string operator[](unsigned index) const;
+            
+            
+            unsigned short CastSpell();
+           
+
+    };
 protected:
     unsigned short intellect = 27;
-    string spell[4] = { "вспышка", "магисческая стрела", "огненный шар", "метеоритный дождь" };
+    Spell spells[5] = { 
+        Spell("Насмешка", 32,52,false,23),
+        Spell("DOMEIN EXPENSION", 1000,99,false,100), 
+        Spell("Яд гооргоны", 15,30,false,80),
+        Spell("ахатыбд", 999,0,false,52),
+        Spell("Священый меч эсканор", 100,25,false,0),
+    };
 public:
     Wizard()
     {
@@ -50,9 +77,9 @@ public:
         this->health = health;
         this->damage = damage;
     }
-    void GetInfo() override; //полиморфизм (перегрузка для метода)
-   
-    void CastSpell();
+    void GetInfo() override; 
+
+    void GetSpellInfo();
    
     void Create() override;
     
@@ -95,7 +122,6 @@ public:
         cout << "Введите имя персонажа\t";
         cin >> name;
         GetInfo();
-        CastSpell();
         GetWeapons();
     }
     bool operator == (const Paladin& paladin) const
@@ -136,6 +162,7 @@ public:
         }
     }
 };
+
 
 
 
