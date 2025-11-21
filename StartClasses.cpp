@@ -114,22 +114,28 @@ void Wizard::GetInfo() //полиморфизм (перегрузка для м�
     Npc::GetInfo();
     cout << "Интеллект - " << intellect << endl;
     cout << "Доступные заклинания в книге заклинаний - ";
+   
+}
+void Wizard::GetSpellInfo()
+{
     for (int i = 0; i < lvl; i++)
     {
-        cout << spell[i] << endl;
+        cout << i + 1 << "Заклинание:\n";
+        for (int j = 0; j < 5; j++)
+        {
+            cout << spells[i][j] << endl;
+        }
+        cout << endl;
     }
 }
-void Wizard::CastSpell()
-{
-    cout << name << " применяет " << spell[lvl - 1] << endl;
-}
+
 void Wizard::Create()
 {
     cout << "Вы создали волшебника" << endl;
     cout << "Введите имя персонажа\t";
     cin >> name;
     GetInfo();
-    CastSpell();
+   
 }
 bool Wizard::operator == (const Wizard& wizard) const
 {
