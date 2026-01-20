@@ -108,8 +108,6 @@ Warrior::~Warrior() //деструктор всегда без аргумент�
 {
     cout << name << " пал смертью храбрых" << endl;
 }
-#include "StartClasses.h"
-
 
 Wizard::Spell::Spell(string name, unsigned short damage,
     unsigned short price, bool isCurse, int timeCast)
