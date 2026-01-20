@@ -83,18 +83,7 @@ void Player::Create()
 
 
 }
-bool Player::Save()
-{
-    return currentCharacter ? currentCharacter->Save() : false;
-}
-bool Player::Load(unique_ptr<Npc> player)
-{
-    if (player->Load()) {
-        currentCharacter = move(player);
-        return true;
-    }
-    return false;
-}
+
 Npc* Player::GetCharacter()
 {
     return currentCharacter.get();
