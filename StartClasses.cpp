@@ -3,59 +3,57 @@ bool Warrior::Save()
 {
 
 
-    if (Npc::Save())
+    
+    ofstream saveSystem("save.bin", ios::binary);
+    if (saveSystem.is_open())
     {
-        ofstream saveSystem("save.bin", ios::binary);
-        if (saveSystem.is_open())
-        {
-
-            saveSystem.write(reinterpret_cast<const char*>(&strenght), sizeof(strenght));
-            for (int i = 0; i < 4; i++)
-            {
-                saveSystem.write(reinterpret_cast<const char*>(&weapons[i]), sizeof(weapons[i]));
-            }
-            saveSystem.close();
-            return true;
-        }
-        else
+        if (Npc::Save())
         {
             cout << "сохранение не удалось" << endl;
             return false;
         }
+        saveSystem.write(reinterpret_cast<const char*>(&strenght), sizeof(strenght));
+        saveSystem.close();
+        return true;
     }
+    else
+    {
+        cout << "сохранение не удалось" << endl;
+        return false;
+    }
+    
 };
-Warrior Warrior::Load()
+bool Warrior::Load()
 {
     ifstream loadSystem("save.bin", ios::binary);
-    Warrior warrior; //временное хранилище для считывания данных из файла
-    warrior = Npc::Load();
+   
     if (loadSystem.is_open())
     {
-        loadSystem.read(reinterpret_cast<char*>(&strenght), sizeof(strenght));
-        for (int i = 0; i < 4; i++)
+        if (!Npc::Load())
         {
-            loadSystem.read(reinterpret_cast<char*>(&weapons[i]), sizeof(weapons[i]));
+            cout << "связь с базой нарушена\nПамять утерена" << endl;
+            return false;
         }
+        loadSystem.read(reinterpret_cast<char*>(&strenght), sizeof(strenght));
+       
     }
     else
     {
         cout << "связь с базой нарушена\nПамять утерена" << endl;
-        return warrior;
+        return false;
     }
     loadSystem.close();
-    return warrior;
+    return true;
 
 
 };
-
-
 Warrior::Warrior() //конструктор по умолчанию, когда нет аргументов
 {
     name = "воин";
     health = 35;
     damage = 10;
 }
-//кастомный конструктор
+
 Warrior::Warrior(string name, unsigned int health, float damage)
 {
     cout << "кастомный конструктор война" << endl;
@@ -88,10 +86,114 @@ void Warrior::Create()
 }
 bool Warrior::operator == (const Warrior& warrior) const
 {
-    return ((warrior.damage == this->damage) && (warrior.health == this->health)
-        && (warrior.strenght == this->strenght));
+    return (warrior.damage == this->damage) &&
+           (warrior.health == this->health) &&
+           (warrior.strenght == this->strenght);
 }
-void Warrior::operator = (Npc npc)
+Warrior& Warrior::operator = (const Npc& npc)
+{
+    if (this != &npc)
+    {
+        this->name = npc.GetName();
+        this->health = npc.GetHealth();
+        this->damage = npc.GetDamage();
+        this->lvl = npc.GetLvl();
+        return *this;
+    }
+
+}
+
+
+Warrior::~Warrior() //деструктор всегда без аргументов
+{
+    cout << name << " пал смертью храбрых" << endl;
+}
+#include "StartClasses.h"
+
+
+Wizard::Spell::Spell(string name, unsigned short damage,
+    unsigned short price, bool isCurse, int timeCast)
+    : name(name), damage(damage), price(price),
+    isCurse(isCurse), timeCast(timeCast)
+{
+}
+
+unsigned short Wizard::Spell::CastSpell()
+{
+    return 0;
+}
+
+bool Wizard::Save()
+{
+    ofstream saveSystem("save.bin", ios::binary);
+    if (saveSystem.is_open())
+    {
+        if (!Npc::Save())
+        {
+            cout << "сохранение не удалось" << endl;
+            return false;
+        }
+        saveSystem.write(reinterpret_cast<const char*>(&intellect), sizeof(intellect));
+        saveSystem.close();
+        return true;
+    }
+    else
+    {
+        cout << "сохранение не удалось" << endl;
+        return false;
+    }
+}
+bool Wizard::Load()
+{
+    ifstream loadSystem("save.bin", ios::binary);
+    if (loadSystem.is_open())
+    {
+        if (!Npc::Load())
+        {
+            cout << "связь с базой нарушена\nПамять утерена" << endl;
+            return false;
+        }
+        loadSystem.read(reinterpret_cast<char*>(&intellect), sizeof(intellect));
+        loadSystem.close();
+        return true;
+    }
+    else
+    {
+        cout << "связь с базой нарушена\nПамять утерена" << endl;
+        return false;
+    }
+}
+void Wizard::GetInfo() //полиморфизм (перегрузка для метода)
+{
+    Npc::GetInfo();
+    cout << "Интеллект - " << intellect << endl;
+    cout << "Доступные заклинания в книге заклинаний - ";
+   
+}
+void Wizard::GetSpellInfo()
+{
+    for (int i = 0; i < 5; i++)
+    {
+        cout << i + 1 << " Заклинание: " << spells[i].GetName()
+            << ", Урон: " << spells[i].GetDamage()
+            << ", Цена: " << spells[i].GetPrice() << endl;
+    }
+}
+
+void Wizard::Create()
+{
+    cout << "Вы создали волшебника" << endl;
+    cout << "Введите имя персонажа\t";
+    cin >> name;
+    GetInfo();
+   
+}
+bool Wizard::operator == (const Wizard& wizard) const
+{
+    return ((wizard.damage == this->damage) && (wizard.health == this->health)
+        && (wizard.intellect == this->intellect));
+}
+void Wizard::operator = (Npc npc)
 {
     this->name = npc.GetName();
     this->name = npc.GetHealth();
@@ -99,9 +201,103 @@ void Warrior::operator = (Npc npc)
     this->name = npc.GetLvl();
 }
 
-//деструктор - метод, который вызывается автоматически при высвобождении памяти
-//при окончании работы с экземпляром класса (нельзя вызвать вручную)
-Warrior::~Warrior() //деструктор всегда без аргументов
+Wizard::~Wizard() //деструктор всегда без аргументов
 {
-    cout << name << " пал смертью храбрых" << endl;
+    cout << name << " испустил дух" << endl;
+}
+
+
+
+
+
+
+Paladin::Paladin()
+{
+    name = "паладин";
+    health = 25;
+    damage = 12;
+    strenght = 27;
+    intellect = 27;
+}
+void Paladin::GetInfo()
+{
+    cout << "Имя - " << name << endl;
+    cout << "Здоровье - " << health << endl;
+    cout << "Урон - " << damage << endl;
+    cout << "Сила - " << strenght << endl;
+    cout << "Интеллект - " << intellect << endl;
+}
+
+void Paladin::Create()
+{
+    cout << "Вы создали паладина" << endl;
+    cout << "Введите имя персонажа\t";
+    cin >> name;
+    GetInfo();
+    GetWeapons();  // Наследуется от Warrior
+}
+
+bool Paladin::operator == (const Paladin& paladin) const
+{
+    return (paladin.damage == this->damage) &&
+        (paladin.health == this->health) &&
+        (paladin.strenght == this->strenght) &&
+        (paladin.intellect == this->intellect);
+}
+
+Paladin& Paladin::operator = (const Npc& npc)
+{
+    if (this != &npc)
+    {
+        this->name = npc.GetName();
+        this->health = npc.GetHealth();
+        this->damage = npc.GetDamage();
+        this->lvl = npc.GetLvl();
+        this->strenght = 27;  // Значение по умолчанию
+        this->intellect = 27; // Значение по умолчанию
+    }
+    return *this;
+}
+bool Paladin::Save()
+{
+    ofstream saveSystem("save.bin", ios::binary);
+    if (saveSystem.is_open())
+    {
+        if (!Npc::Save())
+        {
+            cout << "сохранение не удалось" << endl;
+            return false;
+        }
+        saveSystem.write(reinterpret_cast<const char*>(&intellect), sizeof(intellect));
+        saveSystem.write(reinterpret_cast<const char*>(&strenght), sizeof(strenght));
+        saveSystem.close();
+        return true;
+    }
+    else
+    {
+        cout << "сохранение не удалось" << endl;
+        return false;
+    }
+}
+
+bool Paladin::Load()
+{
+    ifstream loadSystem("save.bin", ios::binary);
+    if (loadSystem.is_open())
+    {
+        if (!Npc::Load())
+        {
+            cout << "связь с базой нарушена\nПамять утерена" << endl;
+            return false;
+        }
+        loadSystem.read(reinterpret_cast<char*>(&intellect), sizeof(intellect));
+        loadSystem.read(reinterpret_cast<char*>(&strenght), sizeof(strenght));
+        loadSystem.close();
+        return true;
+    }
+    else
+    {
+        cout << "связь с базой нарушена\nПамять утерена" << endl;
+        return false;
+    }
 }
