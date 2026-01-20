@@ -59,7 +59,7 @@ enum class CharacterType
     UNKNOW = 0,
     WARRIOR,
     WIZARD,
-    PALADDIN
+    PALADIN
 };
 
 unique_ptr<Npc> CreateCharacter(CharacterType type)
@@ -75,11 +75,11 @@ unique_ptr<Npc> CreateCharacter(CharacterType type)
     case CharacterType::WIZARD:
         return make_unique<Wizard>();
         break;
-    case CharacterType::PALADDIN:
+    case CharacterType::PALADIN:
         return make_unique<Paladin>();
         break;
     default:
-        invalid_argument("Неизвестный тип персонажа");
+        throw invalid_argument("Неизвестный тип персонажа");
         break;
     }
 }
@@ -103,12 +103,6 @@ int main()
     SetConsoleCP(1251);
     SetConsoleOutputCP(1251);
 
-    //Treasure treasure(ValueQuality::мифическое);
-    //treasure.name = "древняя тарелка";
-    //treasure.price = 30;
-    //treasure.quality = treasure.valueQuality[3];
-    //cout << treasure.name << '\n' << treasure.price << '\n' << treasure.quality << '\n';
-
     Cloth cloth(ValueQuality::mifical);
     cloth.armor = 10;
     cloth.site = cloth.valueSite[2];
@@ -118,7 +112,7 @@ int main()
 
     Player* player = new Player();
 
-    cout << "Привет, путник\nПрисядь у костра и расскажи о себепТы впервые тут?\n\t1 - новый персонаж, \n\t ";
+    cout << "Привет, путник\nПрисядь у костра и расскажи о себепТы впервые тут?\n\t1 - новый персонаж\n\t2 - загрузить\n\t";
     if (TestChoise(2, "Наверно ты ошибся, повтори снова"))
     {
         cout << "Расскажи о своих навыках\n\t1 - Воин\n\t2 - Волшебник\n\t3 - Паладин\n";
@@ -132,7 +126,7 @@ int main()
                 character = CreateCharacter(CharacterType::WIZARD);
                 break;
             case 3:
-                character = CreateCharacter(CharacterType::PALADDIN);
+                character = CreateCharacter(CharacterType::PALADIN);
                 break;
         }
         player->Create(move(character));
